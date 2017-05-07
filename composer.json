@@ -1,0 +1,25 @@
+{
+  "name": "authifly/authifly",
+  "description": "PHP OAuth Authentication Library",
+  "keywords": [
+    "oauth",
+    "openid",
+    "authentication",
+    "authorization",
+    "social",
+    "api"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "require-dev": {
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Authifly\\": "src/"
+    }
+  }
+}
