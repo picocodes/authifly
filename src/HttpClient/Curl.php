@@ -118,8 +118,11 @@ class Curl implements HttpClientInterface
 
         if ('POST' == $method) {
             $body_content = http_build_query($parameters);
+
             if (isset($this->requestHeader['Content-Type']) && $this->requestHeader['Content-Type'] == 'application/json') {
                 $body_content = json_encode($parameters);
+
+                if (isset($parameters[0]) && $parameters[0] == 'empty_json') $body_content = '{}';
             }
 
             $this->curlOptions[CURLOPT_POST] = true;
@@ -128,8 +131,11 @@ class Curl implements HttpClientInterface
 
         if ('PUT' == $method) {
             $body_content = http_build_query($parameters);
+
             if (isset($this->requestHeader['Content-Type']) && $this->requestHeader['Content-Type'] == 'application/json') {
                 $body_content = json_encode($parameters);
+
+                if (isset($parameters[0]) && $parameters[0] == 'empty_json') $body_content = '{}';
             }
 
             $this->curlOptions[CURLOPT_CUSTOMREQUEST] = 'PUT';

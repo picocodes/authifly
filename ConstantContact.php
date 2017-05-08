@@ -2,16 +2,14 @@
 /*!
 * Authifly
 * https://hybridauth.github.io | https://github.com/hybridauth/hybridauth
-*  (c) 2017 Authifly authors | https://hybridauth.github.io/license.html
+*  (c) 2017 Hybridauth authors | https://hybridauth.github.io/license.html
 */
 
 namespace Authifly\Provider;
 
 use Authifly\Adapter\OAuth2;
-use Authifly\Exception\Exception;
 use Authifly\Exception\InvalidArgumentException;
 use Authifly\Exception\UnexpectedApiResponseException;
-use Authifly\Data;
 
 /**
  * ConstantContact OAuth2 provider adapter.
@@ -74,11 +72,30 @@ class ConstantContact extends OAuth2
         return $this->apiRequest('lists', 'GET', ['api_key' => $this->apiKey()], $headers);
     }
 
+    /**
+     * Retrieve details of a contact identified by email address.
+     *
+     * @param string $email_address
+     * @param array $headers
+     *
+     * @return object
+     */
     public function fetchContact($email_address, $headers = [])
     {
         return $this->apiRequest('contacts', 'GET', ['api_key' => $this->apiKey(), 'email' => $email_address], $headers);
     }
 
+    /**
+     * Create contact and add to email/contact list.
+     *
+     * @param string $email_address
+     * @param int $list_id
+     * @param string $first_name
+     * @param string $last_name
+     * @param array $headers
+     *
+     * @return object
+     */
     public function createContact($email_address, $list_id, $first_name = '', $last_name = '', $headers = [])
     {
         $data = array();
@@ -101,6 +118,19 @@ class ConstantContact extends OAuth2
         return $this->apiRequest(sprintf('contacts?action_by=%s&api_key=%s', 'ACTION_BY_VISITOR', $this->apiKey()), 'POST', $data, $headers);
     }
 
+    /**
+     * Add email address/contact to an email list/contact list.
+     *
+     * @param string $email_address
+     * @param int $list_id
+     * @param string $first_name
+     * @param string $last_name
+     * @param array $headers
+     *
+     * @return bool
+     * @throws InvalidArgumentException
+     * @throws UnexpectedApiResponseException
+     */
     public function addContactToList($email_address, $list_id, $first_name = '', $last_name = '', $headers = [])
     {
         // Check if email already exists in Constant Contact.
@@ -149,16 +179,105 @@ class ConstantContact extends OAuth2
             }
 
             return true;
-
-        } else {
-
-            $response = $this->createContact($email_address, $list_id, $first_name, $last_name, $headers);
-            if (is_array($response) && isset($response[0]) && isset($response[0]->error_key)) {
-                throw new InvalidArgumentException($response[0]->error_message, $this->httpClient->getResponseHttpCode());
-            }
-
-            return true;
-
         }
+
+        $response = $this->createContact($email_address, $list_id, $first_name, $last_name, $headers);
+
+        if (is_array($response) && isset($response[0]) && isset($response[0]->error_key)) {
+            throw new InvalidArgumentException($response[0]->error_message, $this->httpClient->getResponseHttpCode());
+        }
+
+        return true;
+    }
+
+    /**
+     * Create (draft) email campaign.
+     *
+     * @param array $payload
+     * @param array $headers
+     *
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function createEmailCampaign($payload, $headers = [])
+    {
+        $defaults = ['is_permission_reminder_enabled' => false, 'email_content_format' => 'HTML', 'status' => 'DRAFT'];
+
+        $required_fields = ['name', 'subject', 'from_name', 'from_email', 'reply_to_email', 'email_content', 'text_content', 'email_content_format', 'message_footer'];
+
+        $payload = array_replace($defaults, $payload);
+
+        foreach ($required_fields as $required_field) {
+            if (!in_array($required_field, array_keys($payload))) :
+                throw new InvalidArgumentException(sprintf('%s required field is missing', $required_field));
+                break;
+            endif;
+        }
+
+
+        $headers = array_replace(['Content-Type' => 'application/json'], $headers);
+
+        $response = $this->apiRequest(sprintf('emailmarketing/campaigns?api_key=%s', $this->apiKey()), 'POST', $payload, $headers);
+
+        if (is_array($response) && isset($response[0]) && isset($response[0]->error_key)) {
+            throw new InvalidArgumentException($response[0]->error_message, $this->httpClient->getResponseHttpCode());
+        }
+
+        return $response;
+    }
+
+
+    /**
+     * Send email campaign immediately.
+     *
+     * @param int $campaign_id
+     * @param array $headers
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return mixed
+     */
+    public function sendEmailCampaign($campaign_id, $headers = [])
+    {
+        $payload = ['empty_json'];
+
+        $headers = array_replace(['Content-Type' => 'application/json'], $headers);
+
+        $response = $this->apiRequest(sprintf('emailmarketing/campaigns/%d/schedules?api_key=%s', $campaign_id, $this->apiKey()), 'POST', $payload, $headers);
+
+        if (is_array($response) && isset($response[0]) && isset($response[0]->error_key)) {
+            throw new InvalidArgumentException($response[0]->error_message, $this->httpClient->getResponseHttpCode());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Schedule email campaign.
+     *
+     * @param int $campaign_id
+     * @param string $scheduled_date Unix timestamp of schedule date.
+     * @param array $headers
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return mixed
+     */
+    public function scheduleEmailCampaign($campaign_id, $scheduled_date, $headers = [])
+    {
+        // convert timestamp to ISO 8601 date which is only accepted by Ctct API
+        $date = date('c', $scheduled_date);
+
+        $payload = ['scheduled_date' => $date];
+
+        $headers = array_replace(['Content-Type' => 'application/json'], $headers);
+
+        $response = $this->apiRequest(sprintf('emailmarketing/campaigns/%d/schedules?api_key=%s', $campaign_id, $this->apiKey()), 'POST', $payload, $headers);
+
+        if (is_array($response) && isset($response[0]) && isset($response[0]->error_key)) {
+            throw new InvalidArgumentException($response[0]->error_message, $this->httpClient->getResponseHttpCode());
+        }
+
+        return $response;
     }
 }
