@@ -205,6 +205,8 @@ class ConstantContact extends OAuth2
 
         $required_fields = ['name', 'subject', 'from_name', 'from_email', 'reply_to_email', 'email_content', 'text_content', 'email_content_format', 'message_footer'];
 
+        $footer_required_fields = ['organization_name', 'address_line_1', 'city', 'country'];
+
         $payload = array_replace($defaults, $payload);
 
         foreach ($required_fields as $required_field) {
@@ -214,6 +216,20 @@ class ConstantContact extends OAuth2
             endif;
         }
 
+        if (is_array($payload['message_footer'])) {
+            foreach ($footer_required_fields as $required_field) {
+                if (!in_array($required_field, array_keys($payload['message_footer']))) :
+                    throw new InvalidArgumentException(sprintf('%s required field is missing', $required_field));
+                    break;
+                endif;
+            }
+        }
+
+        if (is_array($payload['message_footer'])) {
+            if (!array_intersect(['international_state', 'state'], array_keys($payload['message_footer']))) {
+                throw new InvalidArgumentException('one of international_state and state field is missing');
+            }
+        }
 
         $headers = array_replace(['Content-Type' => 'application/json'], $headers);
 
