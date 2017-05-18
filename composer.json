@@ -22,7 +22,8 @@
       "Authifly\\": "src/"
     },
     "files": [
-      "ConstantContact.php"
+      "ConstantContact.php",
+      "Aweber.php"
     ]
   }
 }
