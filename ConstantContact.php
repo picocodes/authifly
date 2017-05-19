@@ -272,17 +272,17 @@ class ConstantContact extends OAuth2
      * Schedule email campaign.
      *
      * @param int $campaign_id
-     * @param string $scheduled_date Unix timestamp of schedule date.
+     * @param string $scheduled_time Unix timestamp to schedule the campaign for sending.
      * @param array $headers
      *
      * @throws InvalidArgumentException
      *
      * @return mixed
      */
-    public function scheduleEmailCampaign($campaign_id, $scheduled_date, $headers = [])
+    public function scheduleEmailCampaign($campaign_id, $scheduled_time, $headers = [])
     {
         // convert timestamp to ISO 8601 date which is only accepted by Ctct API
-        $date = date('c', $scheduled_date);
+        $date = date('c', $scheduled_time);
 
         $payload = ['scheduled_date' => $date];
 

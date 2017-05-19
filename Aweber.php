@@ -207,4 +207,98 @@ class Aweber extends OAuth1
             throw new $e;
         }
     }
+
+    /**
+     * Create broadcast.
+     *
+     * @param int $account_id
+     * @param int $list_id
+     * @param array $payload see https://labs.aweber.com/docs/reference/1.0#broadcast_collection
+     *
+     * @return mixed
+     *
+     * @throws InvalidArgumentException
+     */
+    public function createBroadCast($account_id, $list_id, $payload)
+    {
+        if (empty($account_id) || empty($list_id) || empty($payload)) {
+            throw new InvalidArgumentException('One of either Account ID, list ID or payload is missing');
+        }
+
+        $defaults = ['click_tracking_enabled' => true, 'is_archived' => true, 'notify_on_send' => true];
+
+        $required_fields = ['body_html', 'body_text', 'subject'];
+
+        $payload = array_replace($defaults, $payload);
+
+        foreach ($required_fields as $required_field) {
+            if (!in_array($required_field, array_keys($payload))) :
+                throw new InvalidArgumentException(sprintf('%s required field is missing', $required_field));
+                break;
+            endif;
+        }
+
+        return $this->apiRequest("accounts/$account_id/lists/$list_id/broadcasts", 'POST', $payload);
+    }
+
+    /**
+     * Schedule broadcast.
+     *
+     * @param int $account_id
+     * @param int $list_id
+     * @param int $broadcast_id
+     * @param string $scheduled_time Unix timestamp when the broadcast will be scheduled for sending.
+     *
+     * @return bool
+     *
+     * @throws InvalidArgumentException
+     */
+    public function scheduleBroadCast($account_id, $list_id, $broadcast_id, $scheduled_time)
+    {
+        if (empty($account_id) || empty($list_id) || empty($broadcast_id) || empty($scheduled_time)) {
+            throw new InvalidArgumentException('One of either Account ID, list ID, broadcast ID or scheduled_time is missing');
+        }
+
+        // convert timestamp to ISO 8601 date which is only accepted by Ctct API
+        $scheduled_for = date('c', $scheduled_time);
+
+        $this->apiRequest("accounts/$account_id/lists/$list_id/broadcasts/$broadcast_id/schedule", 'POST', ['scheduled_for' => $scheduled_for]);
+
+        return 200 === $this->httpClient->getResponseHttpCode();
+    }
+
+    /**
+     * Create and send broadcast.
+     *
+     * @param int $account_id
+     * @param int $list_id
+     * @param string $subject
+     * @param string $body_html
+     * @param string $body_text
+     * @param null|string $schedule if this isn't specified, broadcast will be sent immediately.
+     *
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function createSendBroadCast($account_id, $list_id, $subject, $body_html, $body_text, $schedule = null)
+    {
+        if (empty($account_id) || empty($list_id) || empty($subject) || empty($body_html) || empty($body_text)) {
+            throw new InvalidArgumentException('One of either Account ID, list ID, subject, body_html or body_text is missing');
+        }
+
+        // create the broadcast
+        $response = $this->createBroadCast($account_id, $list_id, [
+            'subject' => $subject,
+            'body_html' => $body_html,
+            'body_text' => $body_text
+        ]);
+
+        $broadcast_id = $response->broadcast_id;
+
+        if (is_null($schedule)) {
+            $schedule = strtotime('+30 seconds');
+        }
+
+        return $this->scheduleBroadCast($account_id, $list_id, $broadcast_id, $schedule);
+    }
 }
