@@ -1,42 +1,12 @@
 <?php
-/*!
-* Authifly
-* https://Authifly.github.io | https://github.com/Authifly/Authifly
-*  (c) 2017 Authifly authors | https://Authifly.github.io/license.html
-*/
+
 namespace Authifly\Provider;
 
 use Authifly\Adapter\OAuth1;
 use Authifly\Exception\Exception;
 use Authifly\Exception\InvalidArgumentException;
-use Authifly\Exception\UnexpectedApiResponseException;
 use Authifly\Data;
 
-/**
- * Twitter provider adapter.
- *
- * Example:
- *
- *   $config = [
- *       'callback'  => Authifly\HttpClient\Util::getCurrentUrl(),
- *       'keys'      => [ 'key' => '', 'secret' => '' ], // OAuth1 uses 'key' not 'id'
- *       'authorize' => true
- *   ];
- *
- *   $adapter = new Authifly\Provider\Twitter( $config );
- *
- *   try {
- *       $adapter->authenticate();
- *
- *       $userProfile = $adapter->getUserProfile();
- *       $tokens = $adapter->getAccessToken();
- *       $contacts = $adapter->getUserContacts(['screen_name' =>'andypiper']); // get those of @andypiper
- *       $activity = $adapter->getUserActivity('me');
- *   }
- *   catch( Exception $e ){
- *       echo $e->getMessage() ;
- *   }
- */
 class Aweber extends OAuth1
 {
     /**
