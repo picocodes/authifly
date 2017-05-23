@@ -22,6 +22,7 @@
       "Authifly\\": "src/"
     },
     "files": [
+      "OAuth1CredentialStorage.php",
       "ConstantContact.php",
       "Aweber.php"
     ]
