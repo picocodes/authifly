@@ -2,9 +2,6 @@
 
 namespace Authifly\Storage;
 
-/**
- * AuthiFly storage manager
- */
 class OAuth1CredentialStorage implements StorageInterface
 {
     /**
@@ -29,6 +26,8 @@ class OAuth1CredentialStorage implements StorageInterface
      */
     public function get($key)
     {
+        $key = strtolower($key);
+
         if (!empty($this->credentials[$key])) {
             return $this->credentials[$key];
         }
@@ -41,6 +40,8 @@ class OAuth1CredentialStorage implements StorageInterface
      */
     public function set($key, $value)
     {
+        $key = strtolower($key);
+
         $this->credentials[$key] = $value;
     }
 
@@ -57,6 +58,8 @@ class OAuth1CredentialStorage implements StorageInterface
      */
     public function delete($key)
     {
+        $key = strtolower($key);
+
         if (isset($this->credentials[$key])) {
             unset($this->credentials[$key]);
         }
@@ -67,6 +70,8 @@ class OAuth1CredentialStorage implements StorageInterface
      */
     public function deleteMatch($key)
     {
+        $key = strtolower($key);
+
         if (count($this->credentials)) {
             foreach ($this->credentials as $k => $v) {
                 if (strstr($k, $key)) {
