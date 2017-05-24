@@ -24,7 +24,8 @@
     "files": [
       "OAuth1CredentialStorage.php",
       "ConstantContact.php",
-      "Aweber.php"
+      "Aweber.php",
+      "CampaignMonitor.php"
     ]
   }
 }
