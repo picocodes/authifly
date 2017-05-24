@@ -247,7 +247,7 @@ class Aweber extends OAuth1
      * @param string $body_text
      * @param null|string $schedule if this isn't specified, broadcast will be sent immediately.
      *
-     * @return bool
+     * @return array|bool
      * @throws InvalidArgumentException
      */
     public function createSendBroadCast($account_id, $list_id, $subject, $body_html, $body_text, $schedule = null)
@@ -269,6 +269,12 @@ class Aweber extends OAuth1
             $schedule = strtotime('+30 seconds');
         }
 
-        return $this->scheduleBroadCast($account_id, $list_id, $broadcast_id, $schedule);
+        $send = $this->scheduleBroadCast($account_id, $list_id, $broadcast_id, $schedule);
+
+        if ($send) {
+            return ['success' => true, 'broadcast_id' => $broadcast_id];
+        }
+
+        return $send;
     }
 }
