@@ -81,15 +81,59 @@ class CampaignMonitor extends OAuth2
         return $this->apiRequest('clients.json', 'GET');
     }
 
-    /**
-     * @param array $headers you could use this to supply your own authorization header with access token.
-     *
-     * E.g $constantcontact->getContactList(['Authorization' => 'Bearer ' . 'a8a8f842-a420-4d72-6ye7-25323f4e4934'])
-     *
-     * @return object
-     */
-    public function getEmailList($headers = [])
+    public function getEmailList($cliend_id)
     {
-        return $this->apiRequest('lists/{listid}.{xml|json}', 'GET', ['api_key' => $this->apiKey()], $headers);
+        if (empty($cliend_id)) {
+            throw new InvalidArgumentException('Client ID is missing');
+        }
+
+        return $this->apiRequest("clients/$cliend_id/lists.json");
+    }
+
+    public function addSubscriber($list_id, $payload = [])
+    {
+        if (empty($list_id)) {
+            throw new InvalidArgumentException('List ID is missing');
+        }
+
+        if (empty($payload)) {
+            throw new InvalidArgumentException('Payload is missing');
+        }
+
+        $headers = ['Content-Type' => 'application/json'];
+
+        return $this->apiRequest("subscribers/$list_id.json", 'POST', $payload, $headers);
+    }
+
+    public function addSubscriberEmailName($list_id, $email, $name)
+    {
+        if (empty($list_id)) {
+            throw new InvalidArgumentException('List ID is missing');
+        }
+
+        if (empty($email)) {
+            throw new InvalidArgumentException('Email address is missing');
+        }
+
+        if (empty($name)) {
+            throw new InvalidArgumentException('Name is missing');
+        }
+
+        $payload = [
+            "EmailAddress" => $email,
+            "Name" => $name,
+            "CustomFields" => [
+                array(
+                    'Key' => 'MailOptin',
+                    'Value' => true,
+                )
+            ],
+            "Resubscribe" => true,
+            "RestartSubscriptionBasedAutoresponders" => true
+        ];
+
+        $response = $this->addSubscriber($list_id, $payload);
+
+        return 201 === $this->httpClient->getResponseHttpCode();
     }
 }
