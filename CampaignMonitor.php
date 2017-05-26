@@ -132,8 +132,70 @@ class CampaignMonitor extends OAuth2
             "RestartSubscriptionBasedAutoresponders" => true
         ];
 
-        $response = $this->addSubscriber($list_id, $payload);
+        $this->addSubscriber($list_id, $payload);
 
         return 201 === $this->httpClient->getResponseHttpCode();
+    }
+
+    public function createDraftCampaign($client_id, $payload)
+    {
+        if (empty($client_id)) {
+            throw new InvalidArgumentException('Client ID is missing');
+        }
+
+        if (empty($payload)) {
+            throw new InvalidArgumentException('Payload is missing');
+        }
+
+        if (empty($payload['ListIDs']) && empty($payload['SegmentIDs'])) {
+            throw new InvalidArgumentException('List IDs or Segments to send to is missing.');
+        }
+
+        $required_fields = ['Name', 'Subject', 'FromName', 'FromEmail', 'ReplyTo', 'HtmlUrl'];
+
+        foreach ($required_fields as $required_field) {
+            if (!in_array($required_field, array_keys($payload))) :
+                throw new InvalidArgumentException(sprintf('%s required field is missing', $required_field));
+                break;
+            endif;
+        }
+
+        $headers = ['Content-Type' => 'application/json'];
+
+        return $this->apiRequest("campaigns/$client_id.json", 'POST', $payload, $headers);
+    }
+
+    /**
+     * Send draft campaign.
+     *
+     * @see https://www.campaignmonitor.com/api/campaigns/#sending-draft-campaign
+     *
+     * @param int $campaign_id
+     * @param string $confirmation_email
+     * @param string $send_date
+     *
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function sendDraftCampaign($campaign_id, $confirmation_email, $send_date = 'Immediately')
+    {
+        if (empty($campaign_id)) {
+            throw new InvalidArgumentException('Campaign ID is missing');
+        }
+
+        if (empty($confirmation_email)) {
+            throw new InvalidArgumentException('Confirmation email address cannot be empty.');
+        }
+
+        $headers = ['Content-Type' => 'application/json'];
+
+        $payload = [
+            'ConfirmationEmail' => $confirmation_email,
+            'SendDate' => $send_date
+        ];
+
+        $this->apiRequest("campaigns/$campaign_id/send.json", 'POST', $payload, $headers);
+
+        return 200 === $this->httpClient->getResponseHttpCode();
     }
 }
