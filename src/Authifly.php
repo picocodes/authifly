@@ -15,7 +15,6 @@ use Authifly\Logger\LoggerInterface;
 use Authifly\Logger\Logger;
 use Authifly\HttpClient\HttpClientInterface;
 use Authifly\HttpClient\Curl as HttpClient;
-use Authifly\Deprecated\DeprecatedAuthiflyTrait;
 /**
  * Authifly\Authifly
  *
