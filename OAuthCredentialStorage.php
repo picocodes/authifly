@@ -2,7 +2,7 @@
 
 namespace Authifly\Storage;
 
-class OAuth1CredentialStorage implements StorageInterface
+class OAuthCredentialStorage implements StorageInterface
 {
     /**
      * stores the OAuth1 credentials for subsequent lookups.
