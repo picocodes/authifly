@@ -103,7 +103,7 @@ class CampaignMonitor extends OAuth2
      */
     public function getEmailList($client_id)
     {
-        if (empty($cliend_id)) {
+        if (empty($client_id)) {
             throw new InvalidArgumentException('Client ID is missing');
         }
 
