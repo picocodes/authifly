@@ -40,9 +40,11 @@ class ConstantContact extends OAuth2
     {
         parent::initialize();
 
-        if (!empty($this->config->get('access_token'))) {
+        $config_access_token = $this->config->get('access_token');
+
+        if (!empty($config_access_token)) {
             $this->apiRequestHeaders = [
-                'Authorization' => 'Bearer ' . $this->config->get('access_token')
+                'Authorization' => 'Bearer ' . $config_access_token
             ];
         }
     }

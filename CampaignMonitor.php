@@ -61,16 +61,18 @@ class CampaignMonitor extends OAuth2
         /** Campaign monitor explicitly require access token to be set as Bearer.  */
 
         // if access token is found in storage, utilize else
-        if (!empty($this->getStoredData('access_token'))) {
+        $storage_access_token = $this->getStoredData('access_token');
+        if (!empty($storage_access_token)) {
             $this->apiRequestHeaders = [
-                'Authorization' => 'Bearer ' . $this->getStoredData('access_token')
+                'Authorization' => 'Bearer ' . $storage_access_token
             ];
         }
 
         // use the one supplied in config.
-        if (!empty($this->config->get('access_token'))) {
+        $config_access_token = $this->config->get('access_token');
+        if (!empty($config_access_token)) {
             $this->apiRequestHeaders = [
-                'Authorization' => 'Bearer ' . $this->config->get('access_token')
+                'Authorization' => 'Bearer ' . $config_access_token
             ];
         }
     }
