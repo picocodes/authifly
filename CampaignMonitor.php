@@ -80,11 +80,17 @@ class CampaignMonitor extends OAuth2
     /**
      * Retrieve clients.
      *
-     * @return object
+     * @return array key/index is the clientID and value is the client name.
      */
     public function getClients()
     {
-        return $this->apiRequest('clients.json', 'GET');
+        $result = $this->apiRequest('clients.json', 'GET');
+
+        return array_reduce($result, function ($carry, $item) {
+            $carry[$item->ClientID] = $item->Name;
+
+            return $carry;
+        });
     }
 
     /**
