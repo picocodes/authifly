@@ -45,12 +45,12 @@ class Aweber extends OAuth1
          * array (size=1)
          * 0 =>
          * object(stdClass)[10]
-         * public 'http_etag' => string '"b74b526122119aa35af824f91214febb63456678-ca5feee2b7fbb6febfca8af5541541ea960aaedb"' (length=83)
-         * public 'lists_collection_link' => string 'https://api.aweber.com/1.0/accounts/1158045/lists' (length=49)
-         * public 'self_link' => string 'https://api.aweber.com/1.0/accounts/1158045' (length=43)
+         * public 'http_etag' => string '"b74b526122119aa35af824f91214febb63000000-ca5feee2b7fbb6febfca8af5541541ea960aaedb"' (length=83)
+         * public 'lists_collection_link' => string 'https://api.aweber.com/1.0/accounts/1158000/lists' (length=49)
+         * public 'self_link' => string 'https://api.aweber.com/1.0/accounts/1158000' (length=43)
          * public 'resource_type_link' => string 'https://api.aweber.com/1.0/#account' (length=35)
-         * public 'id' => int 1158045
-         * public 'integrations_collection_link' => string 'https://api.aweber.com/1.0/accounts/1158045/integrations' (length=56)
+         * public 'id' => int 1158000
+         * public 'integrations_collection_link' => string 'https://api.aweber.com/1.0/accounts/1158000/integrations' (length=56)
          * public 'resource_type_link' => string 'https://api.aweber.com/1.0/#accounts' (length=36)
          */
         $response = $this->apiRequest('accounts');
@@ -108,7 +108,7 @@ class Aweber extends OAuth1
          * array (size=2)
          * 0 =>
          * array (size=2)
-         * 0 => int 4687989
+         * 0 => int 4687900
          * 1 => string 'Blog subscribers' (length=16)
          * 1 =>
          * array (size=2)
