@@ -195,11 +195,7 @@ class Aweber extends OAuth1
             throw new InvalidArgumentException('One of either Account ID, list ID or payload is missing');
         }
 
-        $defaults = ['click_tracking_enabled' => true, 'is_archived' => true, 'notify_on_send' => true];
-
         $required_fields = ['body_html', 'body_text', 'subject'];
-
-        $payload = array_replace($defaults, $payload);
 
         foreach ($required_fields as $required_field) {
             if (!in_array($required_field, array_keys($payload))) :
