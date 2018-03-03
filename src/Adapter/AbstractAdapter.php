@@ -215,10 +215,11 @@ abstract class AbstractAdapter implements AdapterInterface
     public function setAccessToken($tokens = [])
     {
         $this->clearStoredData();
-
         foreach ($tokens as $token => $value) {
             $this->storeData($token, $value);
         }
+        // Re-initialize token parameters.
+        $this->initialize();
     }
 
     /**
