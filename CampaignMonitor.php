@@ -144,7 +144,7 @@ class CampaignMonitor extends OAuth2
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function addSubscriberEmailName($list_id, $email, $name)
+    public function addSubscriberEmailName($list_id, $email, $name = '')
     {
         if (empty($list_id)) {
             throw new InvalidArgumentException('List ID is missing');
@@ -152,10 +152,6 @@ class CampaignMonitor extends OAuth2
 
         if (empty($email)) {
             throw new InvalidArgumentException('Email address is missing');
-        }
-
-        if (empty($name)) {
-            throw new InvalidArgumentException('Name is missing');
         }
 
         $payload = [
@@ -170,6 +166,10 @@ class CampaignMonitor extends OAuth2
             "Resubscribe" => true,
             "RestartSubscriptionBasedAutoresponders" => true
         ];
+
+        $payload = array_filter($payload, function ($value) {
+            return !empty($value);
+        });
 
         $this->addSubscriber($list_id, $payload);
 
