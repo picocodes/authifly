@@ -91,11 +91,12 @@ class ConstantContact extends OAuth2
      * @param int $list_id
      * @param string $first_name
      * @param string $last_name
+     * @param array $custom_fields
      * @param array $headers
      *
      * @return object
      */
-    public function createContact($email_address, $list_id, $first_name = '', $last_name = '', $headers = [])
+    public function createContact($email_address, $list_id, $first_name = '', $last_name = '', $custom_fields = [], $headers = [])
     {
         $data = array();
         $data['email_addresses'] = array();
@@ -103,14 +104,28 @@ class ConstantContact extends OAuth2
         $data['email_addresses'][0]['status'] = 'ACTIVE';
         $data['email_addresses'][0]['confirm_status'] = 'CONFIRMED';
         $data['email_addresses'][0]['email_address'] = $email_address;
+        if (!empty($custom_fields) && is_array($custom_fields)) {
+            $index = 1;
+            foreach ($custom_fields as $value) {
+                $data['custom_fields'][] = [
+                    'label' => "CustomField$index",
+                    'name' => "custom_field_{$index}",
+                    'value' => $value
+                ];
+                $index++;
+            }
+        }
         $data['lists'] = array();
         $data['lists'][0]['id'] = $list_id;
         if (!empty($first_name)) {
             $data['first_name'] = $first_name;
         }
+
         if (!empty($last_name)) {
             $data['last_name'] = $last_name;
         }
+
+//        var_dump($data); exit;
 
         $headers = array_replace(['Content-Type' => 'application/json'], $headers);
 
@@ -130,7 +145,7 @@ class ConstantContact extends OAuth2
      * @throws InvalidArgumentException
      * @throws UnexpectedApiResponseException
      */
-    public function addContactToList($email_address, $list_id, $first_name = '', $last_name = '', $headers = [])
+    public function addContactToList($email_address, $list_id, $first_name = '', $last_name = '', $custom_fields = [], $headers = [])
     {
         // Check if email already exists in Constant Contact.
         $contact = $this->fetchContact($email_address, $headers);
@@ -180,7 +195,7 @@ class ConstantContact extends OAuth2
             return true;
         }
 
-        $response = $this->createContact($email_address, $list_id, $first_name, $last_name, $headers);
+        $response = $this->createContact($email_address, $list_id, $first_name, $last_name, $custom_fields, $headers);
 
         if (is_array($response) && isset($response[0]) && isset($response[0]->error_key)) {
             throw new InvalidArgumentException($response[0]->error_message, $this->httpClient->getResponseHttpCode());
