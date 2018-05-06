@@ -140,11 +140,12 @@ class CampaignMonitor extends OAuth2
      * @param string $list_id
      * @param string $email
      * @param string $name
+     * @param array $custom_fields
      *
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function addSubscriberEmailName($list_id, $email, $name = '')
+    public function addSubscriberEmailName($list_id, $email, $name = '', $custom_fields = [])
     {
         if (empty($list_id)) {
             throw new InvalidArgumentException('List ID is missing');
@@ -154,15 +155,26 @@ class CampaignMonitor extends OAuth2
             throw new InvalidArgumentException('Email address is missing');
         }
 
+        $custom_fields_payload = [
+            [
+                'Key' => 'Note',
+                'Value' => 'Via MailOptin',
+            ]
+        ];
+
+        if (!empty($custom_fields) && is_array($custom_fields)) {
+            foreach ($custom_fields as $key => $value) {
+                $custom_fields_payload[] = [
+                    'Key' => $key,
+                    'Value' => $value,
+                ];
+            }
+        }
+
         $payload = [
             "EmailAddress" => $email,
             "Name" => $name,
-            "CustomFields" => [
-                array(
-                    'Key' => 'MailOptin',
-                    'Value' => true,
-                )
-            ],
+            "CustomFields" => $custom_fields_payload,
             "Resubscribe" => true,
             "RestartSubscriptionBasedAutoresponders" => true
         ];
