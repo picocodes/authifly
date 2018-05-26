@@ -25,7 +25,8 @@
       "OAuthCredentialStorage.php",
       "ConstantContact.php",
       "Aweber.php",
-      "CampaignMonitor.php"
+      "CampaignMonitor.php",
+      "Facebook.php"
     ]
   }
 }
