@@ -13,7 +13,7 @@ class CampaignMonitor extends OAuth2
     /**
      * {@inheritdoc}
      */
-    protected $apiBaseUrl = 'https://api.createsend.com/api/v3.1/';
+    protected $apiBaseUrl = 'https://api.createsend.com/api/v3.2/';
 
     /**
      * {@inheritdoc}
@@ -145,7 +145,7 @@ class CampaignMonitor extends OAuth2
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function addSubscriberEmailName($list_id, $email, $name = '', $custom_fields = [])
+    public function addSubscriberEmailName($list_id, $email, $name = '', $custom_fields = [], $consent = '')
     {
         if (empty($list_id)) {
             throw new InvalidArgumentException('List ID is missing');
@@ -176,7 +176,8 @@ class CampaignMonitor extends OAuth2
             "Name" => $name,
             "CustomFields" => $custom_fields_payload,
             "Resubscribe" => true,
-            "RestartSubscriptionBasedAutoresponders" => true
+            "RestartSubscriptionBasedAutoresponders" => true,
+            "ConsentToTrack" => "Yes"
         ];
 
         $payload = array_filter($payload, function ($value) {

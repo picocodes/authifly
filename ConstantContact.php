@@ -125,8 +125,6 @@ class ConstantContact extends OAuth2
             $data['last_name'] = $last_name;
         }
 
-//        var_dump($data); exit;
-
         $headers = array_replace(['Content-Type' => 'application/json'], $headers);
 
         return $this->apiRequest(sprintf('contacts?action_by=%s&api_key=%s', 'ACTION_BY_VISITOR', $this->apiKey()), 'POST', $data, $headers);
