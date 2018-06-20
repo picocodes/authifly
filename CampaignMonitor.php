@@ -145,7 +145,7 @@ class CampaignMonitor extends OAuth2
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function addSubscriberEmailName($list_id, $email, $name = '', $custom_fields = [], $consent = '')
+    public function addSubscriberEmailName($list_id, $email, $name = '', $custom_fields = [], $consent = 'Unchanged')
     {
         if (empty($list_id)) {
             throw new InvalidArgumentException('List ID is missing');
@@ -177,7 +177,7 @@ class CampaignMonitor extends OAuth2
             "CustomFields" => $custom_fields_payload,
             "Resubscribe" => true,
             "RestartSubscriptionBasedAutoresponders" => true,
-            "ConsentToTrack" => "Yes"
+            "ConsentToTrack" => $consent
         ];
 
         $payload = array_filter($payload, function ($value) {
