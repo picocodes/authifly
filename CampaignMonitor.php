@@ -111,6 +111,23 @@ class CampaignMonitor extends OAuth2
     }
 
     /**
+     * Get custom fields of a list.
+     *
+     * @param string $list_id
+     *
+     * @return object
+     * @throws InvalidArgumentException
+     */
+    public function getListCustomFields($list_id)
+    {
+        if (empty($list_id)) {
+            throw new InvalidArgumentException('List ID is missing');
+        }
+
+        return $this->apiRequest("lists/$list_id/customfields.json");
+    }
+
+    /**
      * Add subscriber to an email list.
      *
      * @param string $list_id
