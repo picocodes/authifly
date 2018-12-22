@@ -55,7 +55,7 @@ class Aweber extends OAuth1
          */
         $response = $this->apiRequest('accounts');
 
-        $data = new Data\Collection($response);
+        $data    = new Data\Collection($response);
         $entries = $data->filter('entries')->toArray();
 
         return $entries[0];
@@ -87,6 +87,32 @@ class Aweber extends OAuth1
         }
 
         $response = $this->apiRequest("accounts/$account_id/lists");
+
+        $data = new Data\Collection($response);
+
+        return $data->filter('entries')->toArray();
+    }
+
+    /**
+     * Fetch email/subscriber list custom fields.
+     *
+     * @param int $account_id
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return array
+     */
+    public function getListCustomFields($account_id, $list_id)
+    {
+        if (empty($account_id)) {
+            throw new InvalidArgumentException('Account ID is missing');
+        }
+
+        if (empty($list_id)) {
+            throw new InvalidArgumentException('List ID is missing');
+        }
+
+        $response = $this->apiRequest("accounts/$account_id/lists/$list_id/custom_fields");
 
         $data = new Data\Collection($response);
 
@@ -128,6 +154,17 @@ class Aweber extends OAuth1
         });
     }
 
+    /**
+     * Add subscriber to email/subscriber list.
+     *
+     * @param string|int $account_id
+     * @param string|int $list_id
+     * @param mixed $payload
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return array
+     */
     public function addSubscriber($account_id, $list_id, $payload = [])
     {
         if (empty($account_id) || empty($list_id) || empty($payload)) {
@@ -167,7 +204,7 @@ class Aweber extends OAuth1
 
         } catch (Exception $e) {
 
-            $httpStatusCode = $this->httpClient->getResponseHttpCode();
+            $httpStatusCode   = $this->httpClient->getResponseHttpCode();
             $httpResponseBody = $this->httpClient->getResponseBody();
 
             if (400 === $httpStatusCode && strpos($httpResponseBody, 'already subscribed')) {
@@ -198,7 +235,7 @@ class Aweber extends OAuth1
         $required_fields = ['body_html', 'body_text', 'subject'];
 
         foreach ($required_fields as $required_field) {
-            if (!in_array($required_field, array_keys($payload))) :
+            if ( ! in_array($required_field, array_keys($payload))) :
                 throw new InvalidArgumentException(sprintf('%s required field is missing', $required_field));
                 break;
             endif;
@@ -254,7 +291,7 @@ class Aweber extends OAuth1
 
         // create the broadcast
         $response = $this->createBroadCast($account_id, $list_id, [
-            'subject' => $subject,
+            'subject'   => $subject,
             'body_html' => $body_html,
             'body_text' => $body_text
         ]);
